@@ -10,6 +10,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
+import java.awt.*;
 import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -19,6 +20,7 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,21 +33,25 @@ import java.util.stream.Collectors;
 public class IndexController implements DisposableBean {
     private final HttpClient httpClient = createHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
+    private final LocalDate start = LocalDate.now();
+    private final LocalDate end = start.plusDays(30);
 
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
     @GetMapping("/")
-    public ModelAndView displayArticle(Map<String, Object> model) {
-        var dates = generateApril2025Dates();
+    public ModelAndView permits(Map<String, Object> model) {
+        System.out.println("Permits called at " + LocalDate.now());
+
+        var dates = generateDateWindow();
         var slots = new ArrayList<Slot>();
 
-        slots.addAll(getParkPermits("Waina papá", dates, "61dd69adf4476d02b032ae48", "6569690e5064ad20485ed20d", Map.of(
+        slots.addAll(getParkPermits("Waina papá", dates, "61dd69adf4476d02b032ae48", "6569690e5064ad20485ed20d", 74, Map.of(
           2, "10:00-12:30",
           3, "12:30-15:00",
           4, "15:00-18:00"
         )));
 
-        slots.addAll(getParkPermits("Leo Valley", dates, "63edc307c8f7df7ca39389d0", "643cc6a9b638c78a710c78d2", Map.of(
+        slots.addAll(getParkPermits("Leo Valley", dates, "63edc307c8f7df7ca39389d0", "643cc6a9b638c78a710c78d2", 20, Map.of(
           5, "9:45-11:15",
           6, "10:30-12:00",
           7, "11:15-12:45",
@@ -58,16 +64,15 @@ public class IndexController implements DisposableBean {
           14, "4:30-6:00"
         )));
 
+        model.put("title", start.format(DateTimeFormatter.ofPattern("d. M.")) + " - " + end.format(DateTimeFormatter.ofPattern("d. M.")));
         model.put("dates", dates);
         model.put("slots", slots);
 
         return new ModelAndView("index", model);
     }
 
-    public static List<PermitDate> generateApril2025Dates() {
+    public List<PermitDate> generateDateWindow() {
         List<PermitDate> dates = new ArrayList<>();
-        LocalDate start = LocalDate.of(2025, 4, 1);
-        LocalDate end = LocalDate.of(2025, 4, 30);
 
         for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
             dates.add(new PermitDate(date.getDayOfMonth(), date.getMonthValue()));
@@ -76,10 +81,10 @@ public class IndexController implements DisposableBean {
         return dates;
     }
 
-    public List<Slot> getParkPermits(String parkName, List<PermitDate> dates, String parkId, String ticketId, Map<Integer, String> slots) {
+    public List<Slot> getParkPermits(String parkName, List<PermitDate> dates, String parkId, String ticketId, int maxValue, Map<Integer, String> slots) {
         List<Future<List<DayPermits>>> permits = new ArrayList<>();
         for (PermitDate date : dates) {
-            permits.add(getDayPermits(parkId, ticketId, date, slots));
+            permits.add(getDayPermits(parkId, ticketId, date, maxValue, slots));
         }
         return permits.stream()
           .map(future -> {
@@ -101,7 +106,7 @@ public class IndexController implements DisposableBean {
           .toList();
     }
 
-    public Future<List<DayPermits>> getDayPermits(String parkId, String ticketId, PermitDate date, Map<Integer, String> slots) {
+    public Future<List<DayPermits>> getDayPermits(String parkId, String ticketId, PermitDate date, int maxValue, Map<Integer, String> slots) {
         try {
             Thread.sleep(50);
         } catch (InterruptedException e) {
@@ -122,10 +127,8 @@ public class IndexController implements DisposableBean {
                   .stream()
                   .filter(t -> slots.containsKey(t.slotId))
                   .map(timeslot -> {
-                      var red = timeslot.capacity <= 10;
-                      var orange = !red && timeslot.capacity < 20;
-                      var green = !orange && timeslot.capacity >= 20;
-                      return new DayPermits(timeslot.capacity, red, orange, green, timeslot.slotId);
+                      var color = generateHeatMapColor(timeslot.capacity, 0, maxValue);
+                      return new DayPermits(timeslot.capacity, color, timeslot.slotId);
                   })
                   .toList();
             } catch (Exception e) {
@@ -240,5 +243,16 @@ public class IndexController implements DisposableBean {
             // empty method
         }
     };
+
+    public static Color generateHeatMapColor(int value, int minValue, int maxValue) {
+        // Normalize the value to a range between 0 and 1
+        double normalizedValue = (double) (value - minValue) / (maxValue - minValue);
+
+        double h = normalizedValue * 0.35; // Hue (note 0.4 = Green, see huge chart below)
+        double s = 0.9; // Saturation
+        double b = 0.9; // Brightness
+
+        return Color.getHSBColor((float) h, (float) s, (float) b);
+    }
 
 }

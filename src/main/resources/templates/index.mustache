@@ -8,6 +8,7 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
+<h1 class="text-center">{{ title }}</h1>
 <table class="table">
     <thead>
     <tr>
@@ -23,15 +24,7 @@
         <tr>
             <th>{{parkName}} [{{slotName}}]</th>
             {{#dayPermits}}
-                {{#red}}
-                    <td class="table-danger">{{current}}</td>
-                {{/red}}
-                {{#orange}}
-                    <td class="table-warning">{{current}}</td>
-                {{/orange}}
-                {{#green}}
-                    <td class="table-success">{{current}}</td>
-                {{/green}}
+                <td style="background-color: rgb({{color.red}},{{color.green}},{{color.blue}})">{{current}}</td>
             {{/dayPermits}}
         </tr>
     {{/slots}}
