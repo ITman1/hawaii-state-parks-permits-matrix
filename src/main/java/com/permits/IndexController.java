@@ -33,8 +33,6 @@ import java.util.stream.Collectors;
 public class IndexController implements DisposableBean {
     private final HttpClient httpClient = createHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
-    private final LocalDate start = LocalDate.now();
-    private final LocalDate end = start.plusDays(30);
 
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
@@ -64,7 +62,7 @@ public class IndexController implements DisposableBean {
           14, "4:30-6:00"
         )));
 
-        model.put("title", start.format(DateTimeFormatter.ofPattern("d. M.")) + " - " + end.format(DateTimeFormatter.ofPattern("d. M.")));
+        model.put("title", getStart().format(DateTimeFormatter.ofPattern("d. M.")) + " - " + getEnd().format(DateTimeFormatter.ofPattern("d. M.")));
         model.put("dates", dates);
         model.put("slots", slots);
 
@@ -74,7 +72,7 @@ public class IndexController implements DisposableBean {
     public List<PermitDate> generateDateWindow() {
         List<PermitDate> dates = new ArrayList<>();
 
-        for (LocalDate date = start; !date.isAfter(end); date = date.plusDays(1)) {
+        for (LocalDate date = getStart(); !date.isAfter(getEnd()); date = date.plusDays(1)) {
             dates.add(new PermitDate(date.getDayOfMonth(), date.getMonthValue()));
         }
 
@@ -164,6 +162,14 @@ public class IndexController implements DisposableBean {
             executor.shutdownNow();
             Thread.currentThread().interrupt();
         }
+    }
+
+    private LocalDate getStart() {
+        return LocalDate.now();
+    }
+
+    private LocalDate getEnd() {
+        return getStart().plusDays(30);
     }
 
 
