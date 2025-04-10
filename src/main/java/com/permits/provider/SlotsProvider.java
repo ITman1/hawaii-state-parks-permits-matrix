@@ -9,6 +9,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
+import java.awt.*;
 import java.net.Socket;
 import java.net.http.HttpClient;
 import java.security.SecureRandom;
@@ -94,6 +95,17 @@ public abstract class SlotsProvider implements DisposableBean {
             executor.shutdownNow();
             Thread.currentThread().interrupt();
         }
+    }
+
+    public static Color generateHeatMapColor(int value, int minValue, int maxValue) {
+        // Normalize the value to a range between 0 and 1
+        double normalizedValue = (double) (value - minValue) / (maxValue - minValue);
+
+        double h = normalizedValue * 0.35; // Hue (note 0.4 = Green, see huge chart below)
+        double s = 0.9; // Saturation
+        double b = 0.9; // Brightness
+
+        return Color.getHSBColor((float) h, (float) s, (float) b);
     }
 
 }

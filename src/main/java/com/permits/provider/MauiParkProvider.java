@@ -4,7 +4,6 @@ import com.permits.DayPermits;
 import com.permits.PermitDate;
 import com.permits.Slot;
 
-import java.awt.*;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -37,7 +36,7 @@ public abstract class MauiParkProvider extends SlotsProvider {
           .map(entry -> {
               var slotId = entry.getKey();
               var dayPermits = entry.getValue();
-              return new Slot(parkName, slots.get(slotId), dayPermits);
+              return new Slot(parkName, slots.get(Integer.parseInt(slotId)), dayPermits);
           })
           .toList();
     }
@@ -64,7 +63,7 @@ public abstract class MauiParkProvider extends SlotsProvider {
                   .filter(t -> slots.containsKey(t.slotId))
                   .map(timeslot -> {
                       var color = generateHeatMapColor(timeslot.capacity, 0, maxValue);
-                      return new DayPermits(timeslot.capacity, color, timeslot.slotId);
+                      return new DayPermits(date, timeslot.capacity, color, String.valueOf(timeslot.slotId));
                   })
                   .toList();
             } catch (Exception e) {
@@ -109,17 +108,5 @@ public abstract class MauiParkProvider extends SlotsProvider {
         public int count;
 
         // Getters and setters
-    }
-
-
-    public static Color generateHeatMapColor(int value, int minValue, int maxValue) {
-        // Normalize the value to a range between 0 and 1
-        double normalizedValue = (double) (value - minValue) / (maxValue - minValue);
-
-        double h = normalizedValue * 0.35; // Hue (note 0.4 = Green, see huge chart below)
-        double s = 0.9; // Saturation
-        double b = 0.9; // Brightness
-
-        return Color.getHSBColor((float) h, (float) s, (float) b);
     }
 }
