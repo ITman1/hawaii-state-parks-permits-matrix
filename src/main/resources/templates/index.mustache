@@ -6,8 +6,22 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6Lc1msIfAAAAAOa4o03NGeYDHOx_Gb08Rmxgjnng&amp;ver=6.5.5" id="knss_gohaena_overnight_parking_park_entry_google-recaptcha-js-js"></script>
 </head>
-<body>
+<body onload="onLoad()">
+<script>
+    function onLoad() {
+        grecaptcha.ready(function() {
+            if (window.location.href.indexOf("recaptchaToken") > -1) {
+                window.history.pushState({}, document.title, "/" );
+            } else {
+                grecaptcha.execute('6Lc1msIfAAAAAOa4o03NGeYDHOx_Gb08Rmxgjnng', {action: 'KNSS_ShuttleParkingParkEntry_GetStartTimesForProductsAndDateRanges'}).then(function(token) {
+                    window.location.href = "/?recaptchaToken=" + token;
+                });
+            }
+        });
+    }
+</script>
 <h1 class="text-center">{{ title }}</h1>
 <table class="table">
     <thead>

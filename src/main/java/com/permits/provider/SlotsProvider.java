@@ -25,7 +25,7 @@ public abstract class SlotsProvider implements DisposableBean {
     protected final ObjectMapper mapper = new ObjectMapper();
     protected final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
-    public abstract CompletableFuture<List<Slot>> getSlots(List<PermitDate> dates);
+    public abstract CompletableFuture<List<Slot>> getSlots(String recaptchaToken, List<PermitDate> dates);
 
 
     @SuppressWarnings({"java:S1186", "java:S4830"})

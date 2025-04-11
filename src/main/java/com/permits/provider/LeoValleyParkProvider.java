@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 public class LeoValleyParkProvider extends MauiParkProvider {
 
     @Override
-    public CompletableFuture<List<Slot>> getSlots(List<PermitDate> dates) {
+    public CompletableFuture<List<Slot>> getSlots(String recaptchaToken, List<PermitDate> dates) {
         return CompletableFuture.completedFuture(getParkPermits("Leo Valley", dates, "63edc307c8f7df7ca39389d0", "643cc6a9b638c78a710c78d2", 20, Map.of(
           5, "9:45-11:15",
           6, "10:30-12:00",

@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class KonaSubmarineProvider extends SlotsProvider {
 
     @Override
-    public CompletableFuture<List<Slot>> getSlots(List<PermitDate> dates) {
+    public CompletableFuture<List<Slot>> getSlots(String recaptchaToken, List<PermitDate> dates) {
         List<Future<List<DayPermits>>> permits = new ArrayList<>();
         for (PermitDate date : dates) {
             permits.add(getDayPermits(date, 46));
