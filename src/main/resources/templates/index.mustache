@@ -38,7 +38,12 @@
         <tr>
             <th>{{parkName}} [{{slotName}}]</th>
             {{#dayPermits}}
-                <td style="background-color: rgb({{color.red}},{{color.green}},{{color.blue}})">{{current}}</td>
+                <td style="background-color: rgb({{color.red}},{{color.green}},{{color.blue}})
+                {{#presence}}
+                  ; border: 2px solid #000
+                {{/presence}}
+
+                ">{{current}}</td>
             {{/dayPermits}}
         </tr>
     {{/slots}}

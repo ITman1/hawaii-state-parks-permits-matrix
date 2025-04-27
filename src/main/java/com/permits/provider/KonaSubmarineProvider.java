@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-@Order(2)
+@Order(3)
 @Component
 public class KonaSubmarineProvider extends SlotsProvider {
 
@@ -57,7 +57,7 @@ public class KonaSubmarineProvider extends SlotsProvider {
                   .stream()
                   .filter(dayPermit -> dayPermit.date().equals(date))
                   .findFirst()
-                  .orElse(new DayPermits(date, 0, generateHeatMapColor(0, 0, 46), slot.slotName())))
+                  .orElse(new DayPermits(date, 0, generateHeatMapColor(0, 0, 46), slot.slotName(), date.month() == 5 && date.day() > 17 && date.day() < 24)))
                 .toList();
 
               return new Slot(slot.parkName(), slot.slotName(), dayPermits);
@@ -99,7 +99,7 @@ public class KonaSubmarineProvider extends SlotsProvider {
                             .map(Integer::parseInt)
                             .orElse(0);
 
-                          return new DayPermits(date, permits, generateHeatMapColor(permits, 0, maxValue), time);
+                          return new DayPermits(date, permits, generateHeatMapColor(permits, 0, maxValue), time, date.month() == 5 && date.day() > 17 && date.day() < 24);
                       })
                       .ifPresent(result::add);
                 });

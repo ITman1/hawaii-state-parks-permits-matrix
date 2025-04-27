@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
-@Order(3)
+@Order(4)
 @Component
 public class HaenaParkProvider extends SlotsProvider {
 
@@ -52,7 +52,7 @@ public class HaenaParkProvider extends SlotsProvider {
                   var date = LocalDate.parse(String.valueOf((int) day.get("dateInt")), DateTimeFormatter.ofPattern("yyyyMMdd"));
                   var permitDate = new PermitDate(date.getDayOfMonth(), date.getMonthValue());
                   Color colour = MauiParkProvider.generateHeatMapColor(remainingQuantity, 0, 24);
-                  return (int) day.get("startTime") >= 1000 ? Stream.empty() : Stream.of(new DayPermits(permitDate, remainingQuantity, colour, ""));
+                  return (int) day.get("startTime") >= 1000 ? Stream.empty() : Stream.of(new DayPermits(permitDate, remainingQuantity, colour, "", permitDate.month() == 5 && permitDate.day() > 10 && permitDate.day() < 17));
               })
               .toList();
 

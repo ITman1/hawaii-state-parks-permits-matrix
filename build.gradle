@@ -30,3 +30,8 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.named("bootBuildImage") {
+  imageName = "itman1/hawaii-state-parks-permits-matrix:latest"
+}
+

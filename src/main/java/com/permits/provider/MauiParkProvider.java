@@ -63,7 +63,7 @@ public abstract class MauiParkProvider extends SlotsProvider {
                   .filter(t -> slots.containsKey(t.slotId))
                   .map(timeslot -> {
                       var color = generateHeatMapColor(timeslot.capacity, 0, maxValue);
-                      return new DayPermits(date, timeslot.capacity, color, String.valueOf(timeslot.slotId));
+                      return new DayPermits(date, timeslot.capacity, color, String.valueOf(timeslot.slotId), date.month() == 5 && date.day() > 4 && date.day() < 10);
                   })
                   .toList();
             } catch (Exception e) {
