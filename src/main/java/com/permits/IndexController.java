@@ -1,13 +1,18 @@
 package com.permits;
 
+import com.permits.jobs.KalalauTrailChecker;
 import com.permits.provider.SlotsProvider;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -19,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 @Controller
 public class IndexController {
 
+    private final KalalauTrailChecker kalalauTrailChecker;
     private final TimeSupport timeSupport;
     private final List<SlotsProvider> slotsProviders;
 
@@ -44,6 +50,11 @@ public class IndexController {
         model.put("slots", slots);
 
         return new ModelAndView("index", model);
+    }
+
+    @GetMapping("/check/{monthDay}")
+    public void check(@PathVariable String monthDay) throws MessagingException, URISyntaxException, IOException, InterruptedException {
+        kalalauTrailChecker.checkOnRequest(monthDay);
     }
 
     public List<PermitDate> generateDateWindow() {

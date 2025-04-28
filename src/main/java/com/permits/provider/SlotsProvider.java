@@ -67,7 +67,7 @@ public abstract class SlotsProvider implements DisposableBean {
     };
 
 
-    private static HttpClient createHttpClient() {
+    public static HttpClient createHttpClient() {
         SSLContext sslContext;
         try {
             sslContext = SSLContext.getInstance("TLS");
