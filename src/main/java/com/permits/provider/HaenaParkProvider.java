@@ -3,6 +3,8 @@ package com.permits.provider;
 import com.permits.DayPermits;
 import com.permits.PermitDate;
 import com.permits.Slot;
+import com.permits.util.EmailSender;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -26,10 +28,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@AllArgsConstructor
 @Slf4j
 @Order(4)
 @Component
 public class HaenaParkProvider extends SlotsProvider {
+
+    private final EmailSender emailSender;
 
     @Override
     public CompletableFuture<List<Slot>> getSlots(String recaptchaToken, List<PermitDate> dates) {

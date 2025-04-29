@@ -1,0 +1,70 @@
+<html lang="en">
+<head>
+    <title>Permits</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6Lc1msIfAAAAAOa4o03NGeYDHOx_Gb08Rmxgjnng&amp;ver=6.5.5" id="knss_gohaena_overnight_parking_park_entry_google-recaptcha-js-js"></script>
+</head>
+<body onload="onLoad()">
+<script>
+    function onLoad() {
+        grecaptcha.ready(function() {
+            if (window.location.href.indexOf("recaptchaToken") > -1) {
+                window.history.pushState({}, document.title, "/haena" );
+            } else {
+                grecaptcha.execute('6Lc1msIfAAAAAOa4o03NGeYDHOx_Gb08Rmxgjnng', {action: 'KNSS_ShuttleParkingParkEntry_GetStartTimesForProductsAndDateRanges'}).then(function(token) {
+                    window.location.href = "/haena?recaptchaToken=" + token;
+                });
+            }
+        });
+    }
+</script>
+<h1 class="text-center">{{ title }} - <span id="timer"></span></h1>
+<script>
+const timer = document.querySelector('#timer');
+let counter = 30;
+
+setInterval(() => {
+  if (counter === 0) {
+    //this.takeTableDataCallInterval();
+    counter = 30;
+    window.location.href = "/haena"
+  }
+  else {
+    timer.innerHTML = `refresh in ${counter} seconds`;
+    counter--;
+  }
+}, 1000);
+</script>
+<table class="table">
+    <thead>
+    <tr>
+        <th></th>
+        {{#dates}}
+            <th>{{day}}.</th>
+        {{/dates}}
+    </tr>
+    </thead>
+    <tbody>
+
+    {{#slots}}
+        <tr>
+            <th>{{parkName}} [{{slotName}}]</th>
+            {{#dayPermits}}
+                <td style="background-color: rgb({{color.red}},{{color.green}},{{color.blue}})
+                {{#presence}}
+                  ; border: 2px solid #000
+                {{/presence}}
+
+                ">{{current}}</td>
+            {{/dayPermits}}
+        </tr>
+    {{/slots}}
+
+    </tbody>
+</table>
+</body>
+</html>

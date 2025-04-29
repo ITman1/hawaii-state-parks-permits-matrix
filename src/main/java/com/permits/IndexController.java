@@ -1,7 +1,9 @@
 package com.permits;
 
 import com.permits.jobs.KalalauTrailChecker;
+import com.permits.provider.HaenaParkProvider;
 import com.permits.provider.SlotsProvider;
+import com.permits.util.EmailSender;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -26,7 +28,9 @@ public class IndexController {
 
     private final KalalauTrailChecker kalalauTrailChecker;
     private final TimeSupport timeSupport;
+    private final EmailSender emailSender;
     private final List<SlotsProvider> slotsProviders;
+    private final HaenaParkProvider haenaParkProvider;
 
     @GetMapping("/")
     public ModelAndView permits(Map<String, Object> model, @RequestParam(required = false) String recaptchaToken) {
@@ -50,6 +54,24 @@ public class IndexController {
         model.put("slots", slots);
 
         return new ModelAndView("index", model);
+    }
+
+    @GetMapping("/haena")
+    public ModelAndView haena(Map<String, Object> model, @RequestParam(required = false) String recaptchaToken) {
+        var hour = 8;
+        var dates = List.of(new PermitDate(12, 5));
+        var slots = recaptchaToken != null ? haenaParkProvider.getSlots(recaptchaToken, dates).join() : List.<Slot>of();
+        var after8am = slots.stream().filter(a -> a.slotName().contains(hour + ":") && a.dayPermits().getFirst().current() > 1).findFirst().isPresent();
+
+        if (after8am) {
+            emailSender.sendEmails("Haena shuttle - ringme", "There is shuttle available after " + hour + " AM");
+        }
+
+        model.put("title", timeSupport.getStart().format(DateTimeFormatter.ofPattern("d. M.")) + " - " + timeSupport.getEnd().format(DateTimeFormatter.ofPattern("d. M.")));
+        model.put("dates", dates);
+        model.put("slots", slots);
+
+        return new ModelAndView("haena", model);
     }
 
     @GetMapping("/check/{monthDay}")
